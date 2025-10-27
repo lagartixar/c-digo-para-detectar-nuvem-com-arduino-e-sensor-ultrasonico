@@ -31,7 +31,7 @@ void loop() {
 
   if (duration == 0) {
     Serial.println("Sem reflexo (>5m ou nuvem fina)");
-    digitalWrite(ledPin, LOW);
+    digitalWrite(pingPin, HIGH);
   } else {
     // --- CÁLCULO EM CM (fórmula oficial do Ping) ---
     float distancia_cm = duration / US_TO_CM;
