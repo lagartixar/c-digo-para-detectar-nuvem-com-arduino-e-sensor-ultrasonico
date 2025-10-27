@@ -27,7 +27,7 @@ void loop() {
   long duration = pulseIn(pingPin, HIGH, 35000);  // Timeout ~6m
 
   if (duration == 0) {
-    Serial.println("Sem reflexo (muito longe ou céu limpo)");
+    Serial.println("Sem reflexo (muito longe ou ceu limpo)");
     digitalWrite(ledPin, LOW);
   } else {
     float distancia_cm = duration / US_TO_CM;
