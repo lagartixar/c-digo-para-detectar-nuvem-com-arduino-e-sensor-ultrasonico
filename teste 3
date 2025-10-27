@@ -1,0 +1,60 @@
+const int pingPin = 9;  // Pino SIG do Parallax Ping
+const int ledPin = 3;   // LED indicador
+
+const float US_TO_CM = 29.0;  // Conversão: 29 µs/cm (ida e volta)
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(pingPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, LOW);
+
+  // Mensagem para a apresentação
+  Serial.println("=====================================");
+  Serial.println("   DETECTOR DE NUVENS (ALGODÃO/MÃO)  ");
+  Serial.println("   LED ACENDE: ALTURA > 3 METROS    ");
+  Serial.println("=====================================");
+  delay(2000);
+}
+
+void loop() {
+  // --- DISPARO DO PULSO ---
+  digitalWrite(pingPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pingPin, HIGH);
+  delayMicroseconds(5);  // Pulso curto para o Ping
+  digitalWrite(pingPin, LOW);
+  pinMode(pingPin, INPUT);
+
+  // Timeout para ~6m (segurança)
+  long duration = pulseIn(pingPin, HIGH, 35000);
+
+  if (duration == 0) {
+    Serial.println("Sem detecção (céu limpo ou >5m)");
+    digitalWrite(ledPin, LOW);
+  } else {
+    float distancia_cm = duration / US_TO_CM;
+    float distancia_m = distancia_cm / 100.0;
+
+    // Exibe altura
+    Serial.print("Altura detectada: ");
+    Serial.print(distancia_m, 2);
+    Serial.println(" m");
+
+    // LED ACENDE SE ALGODÃO/MÃO > 3 METROS
+    if (distancia_m > 3.0 && distancia_m <= 5.0) {
+      digitalWrite(ledPin, HIGH);
+      Serial.println(">>> NUVEM (ALGODÃO/MÃO) ALTA DETECTADA! <<<");
+    } else {
+      digitalWrite(ledPin, LOW);
+      Serial.print("Objeto baixo (≤3m) ou sem nuvem alta");
+      if (distancia_m <= 3.0) {
+        Serial.println(" - Tente subir o algodão/mão!");
+      } else {
+        Serial.println();
+      }
+    }
+  }
+
+  delay(800);  // Leitura a cada 0,8s
+}
