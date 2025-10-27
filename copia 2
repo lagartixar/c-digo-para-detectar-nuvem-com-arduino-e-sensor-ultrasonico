@@ -7,20 +7,20 @@ void setup() {
   Serial.begin(9600);
   pinMode(pingPin, OUTPUT);
   pinMode(ledPin, OUTPUT);
-  
+
   digitalWrite(ledPin, LOW);
-  
+
   Serial.println("=== DETECTOR DE NUVENS PARALLAX PING ATÉ 5M ===");
   Serial.println("Distância em CM e METROS");
   delay(1000);
 }
 
 void loop() {
-  // --- TRIGGER: PULSO DE 2µs ---
+  // --- TRIGGER: PULSO DE 5µs ---
   digitalWrite(pingPin, LOW);
   delayMicroseconds(2);
-  digitalSwitch(pingPin, HIGH);
-  delayMicroseconds(5);  // Pulo curto para trigger
+  digitalWrite(pingPin, HIGH);   // CORRIGIDO AQUI!
+  delayMicroseconds(5);          // Pulso de 5µs (recomendado pelo Ping)
   digitalWrite(pingPin, LOW);
 
   // Muda para INPUT para ler o ECHO
@@ -31,7 +31,7 @@ void loop() {
 
   if (duration == 0) {
     Serial.println("Sem reflexo (>5m ou nuvem fina)");
-    digitalWrite(pingPin, HIGH);
+    digitalWrite(ledPin, LOW);
   } else {
     // --- CÁLCULO EM CM (fórmula oficial do Ping) ---
     float distancia_cm = duration / US_TO_CM;
