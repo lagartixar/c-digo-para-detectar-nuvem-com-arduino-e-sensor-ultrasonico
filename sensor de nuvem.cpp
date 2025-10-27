@@ -1,5 +1,5 @@
-const int trigPin = 3;
-const int echoPin = 4;
+const int trigPin = 4;
+const int echoPin = 3;
 const int ledPin = 11;
 
 // Velocidade do som em cm/µs (a 20°C)
@@ -58,3 +58,4 @@ void loop() {
   delay(600); // Leitura a cada ~0,6s
 
 }
+
