@@ -1,0 +1,58 @@
+const int pingPin = 9;  // Pino SIG do Parallax Ping
+const int ledPin = 3;
+
+const float US_TO_CM = 29.0;  // 29 µs por cm (ida e volta, a ~20°C)
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(pingPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+  
+  digitalWrite(ledPin, LOW);
+  
+  Serial.println("=== DETECTOR DE NUVENS PARALLAX PING ATÉ 5M ===");
+  Serial.println("Distância em CM e METROS");
+  delay(1000);
+}
+
+void loop() {
+  // --- TRIGGER: PULSO DE 2µs ---
+  digitalWrite(pingPin, LOW);
+  delayMicroseconds(2);
+  digitalSwitch(pingPin, HIGH);
+  delayMicroseconds(5);  // Pulo curto para trigger
+  digitalWrite(pingPin, LOW);
+
+  // Muda para INPUT para ler o ECHO
+  pinMode(pingPin, INPUT);
+
+  // --- LEITURA COM TIMEOUT (6 metros = ~35ms) ---
+  long duration = pulseIn(pingPin, HIGH, 35000);
+
+  if (duration == 0) {
+    Serial.println("Sem reflexo (>5m ou nuvem fina)");
+    digitalWrite(ledPin, LOW);
+  } else {
+    // --- CÁLCULO EM CM (fórmula oficial do Ping) ---
+    float distancia_cm = duration / US_TO_CM;
+    
+    // --- CONVERSÃO PARA METROS ---
+    float distancia_m = distancia_cm / 100.0;
+
+    // --- EXIBE AS DUAS UNIDADES ---
+    Serial.print("Distância: ");
+    Serial.print(distancia_cm, 1);
+    Serial.print(" cm | ");
+    Serial.print(distancia_m, 2);
+    Serial.println(" m");
+
+    // --- ACENDE LED SE ATÉ 5 METROS ---
+    if (distancia_m <= 5.0) {
+      digitalWrite(ledPin, HIGH);
+    } else {
+      digitalWrite(ledPin, LOW);
+    }
+  }
+
+  delay(600);  // Leitura a cada ~0,6s
+}
