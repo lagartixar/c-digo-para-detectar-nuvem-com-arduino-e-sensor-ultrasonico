@@ -1,7 +1,7 @@
 const int pingPin = 9;  // Pino SIG do Parallax Ping
 const int ledPin = 3;
 
-const float US_TO_CM = 29.0;  // 29 µs por cm (ida e volta, a ~20°C)
+const float US_TO_CM = 29.0;  // 29 µs/cm (ida e volta)
 
 void setup() {
   Serial.begin(9600);
@@ -10,49 +10,42 @@ void setup() {
 
   digitalWrite(ledPin, LOW);
 
-  Serial.println("=== DETECTOR DE NUVENS PARALLAX PING ATÉ 5M ===");
-  Serial.println("Distância em CM e METROS");
+  Serial.println("=== DETECTOR DE NUVENS ALTAS (> 3 METROS) ===");
+  Serial.println("LED acende se nuvem estiver ACIMA de 3m");
   delay(1000);
 }
 
 void loop() {
-  // --- TRIGGER: PULSO DE 5µs ---
+  // --- DISPARO DO PULSO ---
   digitalWrite(pingPin, LOW);
   delayMicroseconds(2);
-  digitalWrite(pingPin, HIGH);   // CORRIGIDO AQUI!
-  delayMicroseconds(5);          // Pulso de 5µs (recomendado pelo Ping)
+  digitalWrite(pingPin, HIGH);
+  delayMicroseconds(5);
   digitalWrite(pingPin, LOW);
 
-  // Muda para INPUT para ler o ECHO
   pinMode(pingPin, INPUT);
-
-  // --- LEITURA COM TIMEOUT (6 metros = ~35ms) ---
-  long duration = pulseIn(pingPin, HIGH, 35000);
+  long duration = pulseIn(pingPin, HIGH, 35000);  // Timeout ~6m
 
   if (duration == 0) {
-    Serial.println("Sem reflexo (>5m ou nuvem fina)");
+    Serial.println("Sem reflexo (muito longe ou céu limpo)");
     digitalWrite(ledPin, LOW);
   } else {
-    // --- CÁLCULO EM CM (fórmula oficial do Ping) ---
     float distancia_cm = duration / US_TO_CM;
-    
-    // --- CONVERSÃO PARA METROS ---
     float distancia_m = distancia_cm / 100.0;
 
-    // --- EXIBE AS DUAS UNIDADES ---
-    Serial.print("Distância: ");
-    Serial.print(distancia_cm, 1);
-    Serial.print(" cm | ");
+    Serial.print("Altura da nuvem: ");
     Serial.print(distancia_m, 2);
     Serial.println(" m");
 
-    // --- ACENDE LED SE ATÉ 5 METROS ---
-    if (distancia_m <= 5.0) {
+    // LED ACENDE SÓ SE A NUVEM ESTIVER MAIOR QUE 3 METROS
+    if (distancia_m > 3.0) {
       digitalWrite(ledPin, HIGH);
+      Serial.println(">>> NUVEM ALTA DETECTADA! (acima de 3m) <<<");
     } else {
       digitalWrite(ledPin, LOW);
+      Serial.println("Nuvem baixa ou sem nuvem alta");
     }
   }
 
-  delay(600);  // Leitura a cada ~0,6s
+  delay(600);
 }
