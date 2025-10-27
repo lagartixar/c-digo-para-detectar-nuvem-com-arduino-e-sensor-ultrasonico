@@ -11,7 +11,7 @@ void setup() {
 
   // Mensagem para a apresentação
   Serial.println("=====================================");
-  Serial.println("   DETECTOR DE NUVENS (ALGODÃO/MÃO)  ");
+  Serial.println("   DETECTOR DE NUVENS (ALGODAO/MAO)  ");
   Serial.println("   LED ACENDE: ALTURA > 3 METROS    ");
   Serial.println("=====================================");
   delay(2000);
