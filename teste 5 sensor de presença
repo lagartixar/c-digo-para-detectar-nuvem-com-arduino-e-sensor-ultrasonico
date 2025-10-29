@@ -1,0 +1,58 @@
+// --- Pinos ---
+const int trigPin = 4;
+const int echoPin = 3;
+const int ledPin = 11;
+
+// --- Velocidade do som em cm/µs ---
+const float VELOCIDADE_SOM = 0.0343;
+
+// --- Distância limite para presença (em cm) ---
+const int LIMITE_PRESENCA = 100;  // 100 cm = 1 metro
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+  
+  digitalWrite(trigPin, LOW);
+  digitalWrite(ledPin, LOW);
+  
+  Serial.println("=== SENSOR DE PRESENÇA ULTRASSÔNICO ===");
+  Serial.println("Acende o LED quando algo está até 1 metro de distância.");
+  delay(1000);
+}
+
+void loop() {
+  // --- Disparo do pulso ultrassônico ---
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // --- Leitura do tempo de retorno ---
+  long duration = pulseIn(echoPin, HIGH, 30000); // Timeout ~5m
+
+  if (duration == 0) {
+    Serial.println("Sem detecção.");
+    digitalWrite(ledPin, LOW);
+  } else {
+    // --- Calcula distância ---
+    float distancia_cm = duration * VELOCIDADE_SOM / 2.0;
+
+    Serial.print("Distância: ");
+    Serial.print(distancia_cm, 1);
+    Serial.println(" cm");
+
+    // --- Detecta presença até o limite ---
+    if (distancia_cm <= LIMITE_PRESENCA) {
+      Serial.println("➡️ Presença detectada!");
+      digitalWrite(ledPin, HIGH);
+    } else {
+      digitalWrite(ledPin, LOW);
+    }
+  }
+
+  delay(300); // Pequeno intervalo entre leituras
+}
