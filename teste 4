@@ -1,0 +1,53 @@
+const int trigPin = 4;
+const int echoPin = 3;
+const int ledPin = 11;
+
+// Velocidade do som em cm/µs (a 20°C)
+const float VELOCIDADE_SOM = 0.0343;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+  
+  digitalWrite(trigPin, LOW);
+  digitalWrite(ledPin, HIGH); // LED começa ligado
+  
+  Serial.println("=== SENSOR DE PRESENÇA - APAGA SE OBJETO ATE 20CM ===");
+  delay(1000);
+}
+
+void loop() {
+  // --- DISPARO DO PULSO ---
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // --- LEITURA DO TEMPO DE RETORNO ---
+  long duration = pulseIn(echoPin, HIGH, 35000); // timeout ~6m
+
+  if (duration == 0) {
+    // Nenhum eco detectado → LED ligado
+    Serial.println("Nenhum objeto detectado");
+    digitalWrite(ledPin, HIGH);
+  } else {
+    // --- CÁLCULO DA DISTÂNCIA ---
+    float distancia_cm = duration * VELOCIDADE_SOM / 2.0;
+
+    Serial.print("Distância: ");
+    Serial.print(distancia_cm, 1);
+    Serial.println(" cm");
+
+    // --- APAGA LED SE OBJETO ESTIVER ATE 20 CM ---
+    if (distancia_cm <= 20.0) {
+      digitalWrite(ledPin, LOW);
+    } else {
+      digitalWrite(ledPin, HIGH);
+    }
+  }
+
+  delay(300); // Leitura a cada 0,3s
+}
